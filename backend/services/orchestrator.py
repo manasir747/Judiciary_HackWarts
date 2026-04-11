@@ -18,14 +18,19 @@ class AgentOrchestrator:
         self.vector_store = vector_store
 
     async def analyse(self, document_text: str) -> dict:
-        # Preprocess input
+        # Preprocess input (Must be first)
         processed_data = await self.input_processor.run(document_text)
         clean_text = processed_data.get("processed_input", {}).get("clean_text", document_text)
         
-        # Pass clean text to downstream agents
-        summary_data = await self.summarizer.run(clean_text)
+        # Run Summarizer and Timeline in parallel as they are independent
+        import asyncio
+        summary_task = self.summarizer.run(clean_text)
+        timeline_task = self.timeline.run(clean_text)
+        
+        summary_data, timeline_data = await asyncio.gather(summary_task, timeline_task)
+        
+        # Simplifier depends on summary results
         simplified = await self.simplifier.run(summary_data.get("summary", ""))
-        timeline_data = await self.timeline.run(clean_text)
 
         draft = {
             "document_type": summary_data.get("document_type", "Legal Document"),
@@ -41,6 +46,7 @@ class AgentOrchestrator:
             }
         }
 
+        # Critic runs last to review the final draft
         reviewed = await self.critic.run(draft)
         return reviewed
 

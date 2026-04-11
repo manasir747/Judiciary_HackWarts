@@ -8,6 +8,7 @@ router = APIRouter(prefix="", tags=["analysis"])
 
 
 document_registry: dict[str, dict] = {}
+analysis_cache: dict[str, dict] = {}
 
 
 class TimelineStage(BaseModel):
@@ -38,14 +39,19 @@ async def analyse_document(
         raise HTTPException(status_code=500, detail="Dependencies are not configured")
 
     document_id, text, _chunks = await document_service.ingest_pdf(file)
+    
+    # Check cache
+    if document_id in analysis_cache:
+        logger.info("[Analyse] Cache hit for document_id=%s", document_id)
+        cached_result = analysis_cache[document_id]
+        return JSONResponse(content=cached_result, headers={"X-Document-Id": document_id})
+
     result = await orchestrator.analyse(text)
 
     document_registry[document_id] = {
         "document_type": result.get("document_type", "Legal Document"),
         "case_type": result.get("case_type", "civil"),
     }
-
-    logger.info("[Analyse] Completed for document_id=%s", document_id)
 
     response = AnalyseResponse(
         document_type=result.get("document_type", "Legal Document"),
@@ -56,4 +62,8 @@ async def analyse_document(
         timeline_stages=result.get("timeline_stages", []),
     )
 
-    return JSONResponse(content=response.model_dump(), headers={"X-Document-Id": document_id})
+    data = response.model_dump()
+    analysis_cache[document_id] = data
+    
+    logger.info("[Analyse] Completed and cached for document_id=%s", document_id)
+    return JSONResponse(content=data, headers={"X-Document-Id": document_id})
