@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-PORT="${BACKEND_PORT:-8000}"
+PORT="${PORT:-${BACKEND_PORT:-5000}}"
 PIDS=$(lsof -tiTCP:"$PORT" -sTCP:LISTEN 2>/dev/null || true)
 
 if [ -n "$PIDS" ]; then
