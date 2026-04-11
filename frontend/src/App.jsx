@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Toaster } from "sonner";
+import { useEffect, useState } from "react";
+import { Toaster, toast } from "sonner";
 
 import { AuthPage } from "./components/AuthPage";
 import { Navbar } from "./components/Navbar";
@@ -10,10 +10,38 @@ import { SummaryPanel } from "./components/SummaryPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
 import { ChatPanel } from "./components/ChatPanel";
 import { useLexStore } from "./store/useLexStore";
+import { getSession, signOut } from "./lib/auth";
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { loading, analysis, originalLanguage, toggleOriginalLanguage } = useLexStore();
+
+  useEffect(() => {
+    async function bootstrapSession() {
+      try {
+        const session = await getSession();
+        setIsAuthenticated(Boolean(session));
+      } catch {
+        setIsAuthenticated(false);
+      }
+    }
+
+    bootstrapSession();
+  }, []);
+
+  async function handleLogout() {
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+      setIsAuthenticated(false);
+      toast.success("Logged out successfully.");
+    } catch (error) {
+      toast.error(error?.message || "Unable to log out.");
+    } finally {
+      setIsLoggingOut(false);
+    }
+  }
 
   if (!isAuthenticated) {
     return (
@@ -28,7 +56,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background selection:bg-primary/30 selection:text-white">
-      <Navbar />
+      <Navbar onLogout={handleLogout} isLoggingOut={isLoggingOut} />
       
       {showHero && (
         <Hero>

@@ -1,9 +1,13 @@
 import { useState } from "react";
 import { ArrowRight, LockKeyhole, Mail, ShieldCheck, UserRound } from "lucide-react";
+import { toast } from "sonner";
+
 import { Button } from "./ui/button";
+import { signIn, signUp } from "../lib/auth";
 
 export function AuthPage({ onContinue }) {
   const [mode, setMode] = useState("signIn");
+  const [isLoading, setIsLoading] = useState(false);
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -14,13 +18,32 @@ export function AuthPage({ onContinue }) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   }
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
     if (!form.email || !form.password || (isSignUp && !form.name)) {
       return;
     }
 
-    onContinue();
+    setIsLoading(true);
+    try {
+      if (isSignUp) {
+        const data = await signUp(form.email, form.password);
+        if (data.session) {
+          toast.success("Account created successfully.");
+          onContinue();
+        } else {
+          toast.success("Account created. Please check your email to verify your account.");
+        }
+      } else {
+        await signIn(form.email, form.password);
+        toast.success("Signed in successfully.");
+        onContinue();
+      }
+    } catch (error) {
+      toast.error(error?.message || "Authentication failed.");
+    } finally {
+      setIsLoading(false);
+    }
   }
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-secondary px-4 py-10 text-white sm:px-6 lg:px-8">
@@ -124,10 +147,18 @@ export function AuthPage({ onContinue }) {
 
           <Button
             type="submit"
-            disabled={!form.email || !form.password || (isSignUp && !form.name)}
+            disabled={isLoading || !form.email || !form.password || (isSignUp && !form.name)}
             className="mt-2 h-14 w-full rounded-2xl bg-white text-sm font-bold text-black hover:bg-slate-200"
           >
-            <span>{isSignUp ? "Create Account" : "Enter Workspace"}</span>
+            <span>
+              {isLoading
+                ? isSignUp
+                  ? "Creating account..."
+                  : "Signing in..."
+                : isSignUp
+                  ? "Create Account"
+                  : "Enter Workspace"}
+            </span>
             <ArrowRight className="h-4 w-4" />
           </Button>
         </form>
