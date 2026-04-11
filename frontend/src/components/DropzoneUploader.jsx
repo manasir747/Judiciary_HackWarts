@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { FileUp, Loader2 } from "lucide-react";
+import { FileUp, Loader2, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { analyseDocument } from "../lib/api";
@@ -55,44 +55,66 @@ export function DropzoneUploader() {
   }
 
   return (
-    <div className="mx-auto mt-10 w-full max-w-3xl animate-fadeIn">
-      <h1 className="mb-2 text-center text-3xl font-extrabold tracking-tight text-text sm:text-4xl">
-        Understand any legal document in plain English
-      </h1>
-      <p className="mb-8 text-center text-slate-500">Upload a PDF to generate clear legal insights in seconds.</p>
-
+    <div className="w-full animate-fadeIn">
       <div
         {...getRootProps()}
-        className={`cursor-pointer rounded-card border-2 border-dashed p-10 text-center transition ${
-          isDragActive ? "border-primary bg-indigo-50" : "border-border bg-white"
+        className={`group relative cursor-pointer overflow-hidden rounded-xl border-2 border-dashed p-8 text-center transition-all duration-300 ${
+          isDragActive 
+            ? "border-primary bg-primary/5 shadow-[0_0_30px_rgba(148,163,184,0.1)]" 
+            : "border-slate-800 bg-black/40 hover:border-slate-700 hover:bg-black/60"
         }`}
       >
         <input {...getInputProps()} />
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-indigo-100 text-primary">
-          <FileUp className="h-7 w-7" />
+        
+        <div className="flex flex-col items-center gap-4">
+          <div className={`flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-900 text-primary transition-transform duration-300 group-hover:scale-110 premium-border ${isDragActive ? 'animate-bounce' : ''}`}>
+            <FileUp className="h-8 w-8" />
+          </div>
+          
+          <div className="space-y-1">
+            <p className="text-lg font-medium text-white">
+              {isDragActive ? "Drop your document" : "Secure Document Intake"}
+            </p>
+            <p className="text-sm text-slate-500">
+              PDF only, maximum 10MB
+            </p>
+          </div>
+
+          {file && (
+            <div className="mt-2 flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 animate-fadeIn">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <span className="text-xs font-semibold text-primary truncate max-w-[200px]">
+                {file.name}
+              </span>
+            </div>
+          )}
         </div>
-        <p className="text-base font-semibold text-text">Drag & drop your PDF here</p>
-        <p className="mt-1 text-sm text-slate-500">PDF only, up to 10MB</p>
-        {file ? <p className="mt-3 text-sm font-medium text-primary">Selected: {file.name}</p> : null}
       </div>
 
-      <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">
+      <div className="mt-6 flex flex-col items-center gap-4">
         <Button
           onClick={handleAnalyse}
-          disabled={loading}
-          className="w-full bg-primary text-white hover:bg-indigo-500 sm:w-auto"
+          disabled={loading || !file}
+          className={`h-14 w-full rounded-xl bg-white px-8 font-bold text-black transition-all duration-300 hover:bg-slate-200 disabled:opacity-50 sm:w-auto ${loading ? 'px-12' : ''}`}
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          Analyse Document
+          {loading ? (
+            <div className="flex items-center gap-3 font-semibold">
+              <Loader2 className="h-5 w-5 animate-spin" />
+              <span>Analyzing Agentic Logic...</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Lock className="h-4 w-4" />
+              <span>Examine Document</span>
+            </div>
+          )}
         </Button>
-        <a
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-          href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Try sample document
-        </a>
+        
+        {!loading && (
+          <p className="text-center text-[10px] uppercase tracking-widest text-slate-600 font-bold">
+            Encrypted & Secure Processing
+          </p>
+        )}
       </div>
     </div>
   );

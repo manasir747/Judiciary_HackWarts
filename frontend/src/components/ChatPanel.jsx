@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SendHorizontal } from "lucide-react";
+import { SendHorizontal, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 
 import { chatWithDocument } from "../lib/api";
@@ -10,11 +10,11 @@ import { Card } from "./ui/card";
 
 function TypingIndicator() {
   return (
-    <div className="mb-3 flex justify-start">
-      <div className="rounded-2xl bg-slate-100 px-3 py-2">
-        <span className="typing-dot inline-block h-2 w-2 rounded-full bg-slate-400" />
-        <span className="typing-dot ml-1 inline-block h-2 w-2 rounded-full bg-slate-400" />
-        <span className="typing-dot ml-1 inline-block h-2 w-2 rounded-full bg-slate-400" />
+    <div className="mb-3 flex justify-start animate-fadeIn">
+      <div className="rounded-2xl bg-slate-800 px-3 py-2 border border-white/5">
+        <span className="typing-dot inline-block h-1.5 w-1.5 rounded-full bg-slate-500" />
+        <span className="typing-dot ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-slate-500" />
+        <span className="typing-dot ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-slate-500" />
       </div>
     </div>
   );
@@ -50,13 +50,22 @@ export function ChatPanel() {
   }
 
   return (
-    <Card className="h-full animate-fadeIn">
-      <h2 className="mb-4 text-lg font-bold text-text">Chat</h2>
+    <Card className="premium-glass flex flex-col h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+      <div className="mb-6 flex items-center gap-2">
+        <MessageSquare className="h-5 w-5 text-primary" />
+        <h2 className="font-serif text-xl font-bold text-white">Legal Assistant</h2>
+      </div>
+      
       <StarterChips onSelect={submitMessage} />
 
-      <div className="mb-4 h-[360px] overflow-y-auto rounded-xl border border-border bg-white p-3">
+      <div className="mb-4 h-[360px] overflow-y-auto rounded-xl border border-white/5 bg-black/30 p-4 scrollbar-hide">
         {messages.length === 0 ? (
-          <p className="text-sm text-slate-500">Ask questions about this document.</p>
+          <div className="flex flex-col items-center justify-center h-full text-center space-y-2">
+             <div className="h-10 w-10 rounded-full bg-white/5 flex items-center justify-center text-slate-700">
+               <MessageSquare className="h-5 w-5" />
+             </div>
+             <p className="text-xs text-slate-500 font-medium">Ask specific questions about the document's legal implications.</p>
+          </div>
         ) : (
           messages.map((m, idx) => <ChatBubble key={`${m.role}-${idx}`} role={m.role} message={m.message} />)
         )}
@@ -64,7 +73,7 @@ export function ChatPanel() {
       </div>
 
       <form
-        className="flex items-center gap-2"
+        className="relative flex items-center"
         onSubmit={(e) => {
           e.preventDefault();
           submitMessage(draft);
@@ -73,12 +82,13 @@ export function ChatPanel() {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Ask about this legal document..."
-          className="h-11 flex-1 rounded-xl border border-border px-3 text-sm outline-none ring-primary/30 focus:ring"
+          placeholder="Ask a legal query..."
+          className="h-12 w-full rounded-xl border border-white/10 bg-black/50 px-4 pr-12 text-sm text-slate-200 outline-none transition-all focus:border-primary/50 focus:bg-black/70"
         />
         <button
           type="submit"
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white transition hover:bg-indigo-500"
+          className="absolute right-1.5 h-9 w-9 inline-flex items-center justify-center rounded-lg bg-primary text-black transition-all hover:bg-white active:scale-95 disabled:opacity-50"
+          disabled={!draft.trim() || aiTyping}
         >
           <SendHorizontal className="h-4 w-4" />
         </button>

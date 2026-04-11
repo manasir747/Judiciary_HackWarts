@@ -4,10 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: "#6366F1",
-        bg: "#F8FAFC",
-        text: "#0F172A",
-        border: "#E2E8F0",
+        primary: "#94A3B8", // Slate/Silver
+        secondary: "#030712", // Midnight Blue
+        accent: "#1E293B", // Deep Slate
+        background: "#0B0F1A", // Dark Charcoal
+        text: "#F8FAFC", // Off-white
+        border: "#1E293B",
+      },
+      fontFamily: {
+        serif: ["'Playfair Display'", "serif"],
+        sans: ["'Inter'", "sans-serif"],
       },
       borderRadius: {
         card: "12px",
@@ -26,7 +32,8 @@ export default {
         fadeIn: "fadeIn 500ms ease-out forwards",
       },
       boxShadow: {
-        soft: "0 10px 30px rgba(15, 23, 42, 0.08)",
+        soft: "0 10px 30px rgba(0, 0, 0, 0.5)",
+        premium: "0 4px 20px rgba(0, 0, 0, 0.8)",
       },
     },
   },
