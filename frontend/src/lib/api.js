@@ -16,7 +16,7 @@ export async function analyseDocument(file, userId) {
   });
   return {
     ...data,
-    document_id: headers["x-document-id"] || "",
+    document_id: data.document_id || headers["x-document-id"] || "",
   };
 }
 

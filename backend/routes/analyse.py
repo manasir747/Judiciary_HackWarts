@@ -15,6 +15,7 @@ class TimelineStage(BaseModel):
 
 
 class AnalyseResponse(BaseModel):
+    document_id: str
     document_type: str
     summary: str
     key_points: list[str]
@@ -51,6 +52,7 @@ async def analyse_document(
     result = await orchestrator.analyse(text)
 
     response = AnalyseResponse(
+        document_id=document_id,
         document_type=result.get("document_type", "Legal Document"),
         summary=result.get("summary", ""),
         key_points=result.get("key_points", []),

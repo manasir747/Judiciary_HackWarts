@@ -59,5 +59,7 @@ class AgentOrchestrator:
         if document_id:
             docs = self.vector_store.retrieve(document_id=document_id, query=clean_message, k=4)
             chunks = [doc.page_content for doc in docs]
+            import logging
+            logging.getLogger(__name__).info("[Chat] Retrieved %s chunks for doc_id %s", len(chunks), document_id)
         
         return await self.rag.run(clean_message, chunks)
