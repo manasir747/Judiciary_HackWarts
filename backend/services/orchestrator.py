@@ -1,3 +1,4 @@
+from agents.input_processor_agent import InputProcessorAgent
 from agents.critic_agent import CriticAgent
 from agents.rag_agent import RAGAgent
 from agents.simplifier_agent import SimplifierAgent
@@ -8,6 +9,7 @@ from services.vector_store import VectorStoreService
 
 class AgentOrchestrator:
     def __init__(self, vector_store: VectorStoreService) -> None:
+        self.input_processor = InputProcessorAgent()
         self.summarizer = SummarizerAgent()
         self.simplifier = SimplifierAgent()
         self.timeline = TimelineAgent()
@@ -16,9 +18,14 @@ class AgentOrchestrator:
         self.vector_store = vector_store
 
     async def analyse(self, document_text: str) -> dict:
-        summary_data = await self.summarizer.run(document_text)
+        # Preprocess input
+        processed_data = await self.input_processor.run(document_text)
+        clean_text = processed_data.get("processed_input", {}).get("clean_text", document_text)
+        
+        # Pass clean text to downstream agents
+        summary_data = await self.summarizer.run(clean_text)
         simplified = await self.simplifier.run(summary_data.get("summary", ""))
-        timeline_data = await self.timeline.run(document_text)
+        timeline_data = await self.timeline.run(clean_text)
 
         draft = {
             "document_type": summary_data.get("document_type", "Legal Document"),
@@ -27,15 +34,24 @@ class AgentOrchestrator:
             "case_type": timeline_data.get("case_type", "civil"),
             "timeline_estimate": timeline_data.get("timeline_estimate", "Unknown"),
             "timeline_stages": timeline_data.get("timeline_stages", []),
+            "input_metadata": {
+                "input_type": processed_data.get("processed_input", {}).get("input_type", "UNKNOWN"),
+                "language": processed_data.get("processed_input", {}).get("language", "Unknown"),
+                "confidence": processed_data.get("processed_input", {}).get("confidence", 0.0),
+            }
         }
 
         reviewed = await self.critic.run(draft)
         return reviewed
 
     async def answer_question(self, document_id: str | None, message: str) -> str:
+        # Preprocess question
+        processed_data = await self.input_processor.run(message)
+        clean_message = processed_data.get("processed_input", {}).get("clean_text", message)
+        
         chunks = []
         if document_id:
-            docs = self.vector_store.retrieve(document_id=document_id, query=message, k=4)
+            docs = self.vector_store.retrieve(document_id=document_id, query=clean_message, k=4)
             chunks = [doc.page_content for doc in docs]
         
-        return await self.rag.run(message, chunks)
+        return await self.rag.run(clean_message, chunks)
