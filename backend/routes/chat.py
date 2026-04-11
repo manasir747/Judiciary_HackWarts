@@ -24,9 +24,14 @@ async def chat(request: ChatRequest, app_request: Request):
     if orchestrator is None or supabase_service is None:
         raise HTTPException(status_code=500, detail="Dependencies are not configured")
 
-    if request.document_id and not supabase_service.is_valid_document(request.document_id):
-        raise HTTPException(status_code=404, detail="document_id not found")
+    resolved_document_id = request.document_id
+    has_supabase_client = bool(getattr(supabase_service, "client", None))
 
-    trigger_email_automation(None, reply, request.document_id)
-    logger.info("[Chat] Answered query (doc_id=%s)", request.document_id)
+    if resolved_document_id and has_supabase_client and not supabase_service.is_valid_document(resolved_document_id):
+        logger.warning("[Chat] document_id not found in Supabase, falling back to general chat: %s", resolved_document_id)
+        resolved_document_id = None
+
+    reply = await orchestrator.answer_question(resolved_document_id, request.message)
+    trigger_email_automation(None, reply, resolved_document_id)
+    logger.info("[Chat] Answered query (doc_id=%s)", resolved_document_id)
     return ChatResponse(reply=reply)

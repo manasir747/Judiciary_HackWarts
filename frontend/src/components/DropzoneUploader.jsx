@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { analyseDocument } from "../lib/api";
 import { getCurrentUser } from "../lib/auth";
 import { useLexStore } from "../store/useLexStore";
-import { Button } from "./ui/button";
+import { ButtonColorful } from "./ui/button-colorful";
 
 const MAX_SIZE = 10 * 1024 * 1024;
 
@@ -100,7 +100,7 @@ export function DropzoneUploader() {
       </div>
 
       <div className="mt-6 flex flex-col items-center gap-4">
-        <Button
+        <ButtonColorful
           onClick={handleAnalyse}
           disabled={loading || !file}
           className={`h-14 w-full rounded-xl bg-white px-8 font-bold text-black transition-all duration-300 hover:bg-slate-200 disabled:opacity-50 sm:w-auto ${loading ? 'px-12' : ''}`}
@@ -116,7 +116,7 @@ export function DropzoneUploader() {
               <span>Examine Document</span>
             </div>
           )}
-        </Button>
+        </ButtonColorful>
         
         {!loading && (
           <p className="text-center text-[10px] uppercase tracking-widest text-slate-600 font-bold">

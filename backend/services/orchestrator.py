@@ -72,15 +72,13 @@ class AgentOrchestrator:
         return reviewed
 
     async def answer_question(self, document_id: str | None, message: str) -> str:
-        # Preprocess question
-        processed_data = await self.input_processor.run(message)
-        clean_message = processed_data.get("processed_input", {}).get("clean_text", message)
+        query_text = message.strip() or message
         
         chunks = []
         if document_id:
-            docs = self.vector_store.retrieve(document_id=document_id, query=clean_message, k=4)
+            docs = self.vector_store.retrieve(document_id=document_id, query=query_text, k=4)
             chunks = [doc.page_content for doc in docs]
             import logging
             logging.getLogger(__name__).info("[Chat] Retrieved %s chunks for doc_id %s", len(chunks), document_id)
         
-        return await self.rag.run(clean_message, chunks)
+        return await self.rag.run(query_text, chunks)

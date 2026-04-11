@@ -25,12 +25,20 @@ export function ChatPanel() {
   const { documentId, messages, addMessage, aiTyping, setAiTyping } = useLexStore();
 
   async function submitMessage(input) {
+    if (aiTyping) {
+      return;
+    }
+
     const message = input?.trim();
     if (!message) {
       return;
     }
     // We no longer strictly require documentId for general chatting
     // The backend handles document_id: null for general queries
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === "user" && lastMessage?.message?.trim() === message) {
+      return;
+    }
 
 
     addMessage({ role: "user", message });
@@ -55,7 +63,7 @@ export function ChatPanel() {
         <h2 className="font-serif text-xl font-bold text-white">Legal Assistant</h2>
       </div>
       
-      <StarterChips onSelect={submitMessage} />
+      <StarterChips onSelect={submitMessage} disabled={aiTyping} />
 
       <div className="mb-4 h-[360px] overflow-y-auto rounded-xl border border-white/5 bg-black/30 p-4 scrollbar-hide">
         {messages.length === 0 ? (

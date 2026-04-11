@@ -21,6 +21,7 @@ class RAGAgent(BaseAgent):
                     "Use Markdown formatting for ALL responses to ensure they are professional and easy to read. "
                     "Use bullet points, numbered lists, and bold text where appropriate. "
                     "If document context is provided, prioritize it for answering questions. "
+                    "Answer the CURRENT user question directly; do not reuse generic templates from prior turns. "
                     "If no context is provided or the question is general, answer professionally as a legal expert."
                 ),
                 (

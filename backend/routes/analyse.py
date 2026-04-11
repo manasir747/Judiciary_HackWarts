@@ -76,6 +76,7 @@ async def analyse_document(
 
     if _is_valid_cache(cached_result):
         logger.info("[Analyse] Cache hit (Supabase) for document_id=%s", document_id)
+        cached_result["document_id"] = cached_result.get("document_id") or document_id
         return JSONResponse(content=cached_result, headers={"X-Document-Id": document_id})
     else:
         logger.info("[Analyse] Cache miss or stale — re-running full agent pipeline for document_id=%s", document_id)

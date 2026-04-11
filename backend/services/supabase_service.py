@@ -53,6 +53,7 @@ class SupabaseService:
                 logger.info("[Supabase] Found analysis for %s", document_id)
                 # Reconstruct the analysis object for the frontend
                 return {
+                    "document_id": row.get("document_id", document_id),
                     "document_type": row.get("document_type"),
                     "summary": row.get("summary"),
                     "key_points": row.get("key_points"),

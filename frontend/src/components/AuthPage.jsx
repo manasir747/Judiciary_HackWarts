@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ArrowRight, LockKeyhole, Mail, ShieldCheck, UserRound } from "lucide-react";
 import { toast } from "sonner";
 
-import { Button } from "./ui/button";
+import { ButtonColorful } from "./ui/button-colorful";
 import { signIn, signUp } from "../lib/auth";
 
 export function AuthPage({ onContinue }) {
@@ -145,7 +145,7 @@ export function AuthPage({ onContinue }) {
             </div>
           </label>
 
-          <Button
+          <ButtonColorful
             type="submit"
             disabled={isLoading || !form.email || !form.password || (isSignUp && !form.name)}
             className="mt-2 h-14 w-full rounded-2xl bg-white text-sm font-bold text-black hover:bg-slate-200"
@@ -160,7 +160,7 @@ export function AuthPage({ onContinue }) {
                   : "Enter Workspace"}
             </span>
             <ArrowRight className="h-4 w-4" />
-          </Button>
+          </ButtonColorful>
         </form>
       </div>
     </section>
