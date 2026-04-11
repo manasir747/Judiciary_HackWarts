@@ -11,4 +11,5 @@ chromadb==0.5.11
 pdfplumber==0.11.4
 sentence-transformers==3.1.1
 supabase==2.9.1
+sendgrid
 sendgrid==6.11.0

@@ -1,7 +1,25 @@
 import { Card } from "./ui/card";
-import { BadgeCheck, Info } from "lucide-react";
+import { BadgeCheck, Info, Mail } from "lucide-react";
+import { toast } from "sonner";
 
 export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
+  const handleEmailReport = async () => {
+    const email = window.prompt("Enter recipient email address:");
+    if (!email) return;
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/send-report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, analysis }),
+      });
+      if (response.ok) toast.success("Report emailed successfully!");
+      else toast.error("Failed to send email.");
+    } catch (err) {
+      toast.error("Error sending report.");
+    }
+  };
+
   return (
     <Card className="premium-glass h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
       <div className="mb-6 flex items-center justify-between">
@@ -34,7 +52,7 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
         </div>
       </div>
 
-      <div className="mt-8 pt-6 border-t border-white/5">
+      <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-3">
         <button
           onClick={onToggle}
           className="group flex items-center gap-2 rounded-lg border border-slate-800 bg-black/40 px-4 py-2 text-xs font-semibold text-slate-400 transition-all hover:border-primary/50 hover:text-white"
@@ -42,8 +60,17 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
           <Info className="h-3.5 w-3.5" />
           {originalLanguage ? "Hide Metadata" : "View Extracted Facts"}
         </button>
+
+        <button
+          onClick={handleEmailReport}
+          className="group flex items-center gap-2 rounded-lg border border-slate-800 bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-all hover:bg-primary hover:text-white"
+        >
+          <Mail className="h-3.5 w-3.5" />
+          Email Report
+        </button>
+
         {originalLanguage ? (
-          <div className="mt-4 rounded-lg bg-slate-900/50 p-4 border border-slate-800 animate-fadeIn">
+          <div className="w-full mt-4 rounded-lg bg-slate-900/50 p-4 border border-slate-800 animate-fadeIn">
             <p className="text-[11px] leading-relaxed text-slate-500">
               Agentic Reasoner Note: This summary was generated using multi-agent verification. 
               The original legal phrasing has been cross-referenced with judicial precedents 
