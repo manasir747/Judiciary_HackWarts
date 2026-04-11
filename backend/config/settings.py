@@ -10,6 +10,7 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     groq_model: str = "llama-3.1-8b-instant"
+    groq_gemma_model: str = "gemma2-9b-it"
 
     chroma_persist_directory: str = "./chroma_db"
     chunk_size: int = 1200

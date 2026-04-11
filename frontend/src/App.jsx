@@ -8,6 +8,9 @@ import { DropzoneUploader } from "./components/DropzoneUploader";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { SummaryPanel } from "./components/SummaryPanel";
 import { TimelinePanel } from "./components/TimelinePanel";
+import { RiskPanel } from "./components/RiskPanel";
+import { StrategyPanel } from "./components/StrategyPanel";
+import { SimulationPanel } from "./components/SimulationPanel";
 import { ChatPanel } from "./components/ChatPanel";
 import { useLexStore } from "./store/useLexStore";
 import { getSession, signOut } from "./lib/auth";
@@ -85,6 +88,9 @@ export default function App() {
                 onToggle={toggleOriginalLanguage}
               />
               <TimelinePanel analysis={analysis} />
+              <RiskPanel risks={analysis.risks} />
+              <StrategyPanel strategy={analysis.strategy} />
+              <SimulationPanel simulations={analysis.simulations} />
               <ChatPanel />
             </section>
           </div>
