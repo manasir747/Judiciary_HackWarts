@@ -1,5 +1,5 @@
 import logging
-from fastapi import APIRouter, File, UploadFile, HTTPException, Request
+from fastapi import APIRouter, File, UploadFile, HTTPException, Request, Form
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="", tags=["analysis"])
 
 
-document_registry: dict[str, dict] = {}
-analysis_cache: dict[str, dict] = {}
 
 
 class TimelineStage(BaseModel):
@@ -28,6 +26,7 @@ class AnalyseResponse(BaseModel):
 @router.post("/analyse", response_model=AnalyseResponse)
 async def analyse_document(
     file: UploadFile = File(...),
+    user_id: str = Form(...),
     request: Request = None,
 ):
     if request is None:
@@ -35,23 +34,21 @@ async def analyse_document(
 
     document_service = getattr(request.app.state, "document_service", None)
     orchestrator = getattr(request.app.state, "orchestrator", None)
-    if document_service is None or orchestrator is None:
+    supabase_service = getattr(request.app.state, "supabase_service", None)
+    
+    if document_service is None or orchestrator is None or supabase_service is None:
         raise HTTPException(status_code=500, detail="Dependencies are not configured")
 
     document_id, text, _chunks = await document_service.ingest_pdf(file)
     
-    # Check cache
-    if document_id in analysis_cache:
-        logger.info("[Analyse] Cache hit for document_id=%s", document_id)
-        cached_result = analysis_cache[document_id]
+    # Check Supabase Cache first
+    cached_result = supabase_service.get_analysis(document_id)
+    if cached_result:
+        logger.info("[Analyse] Cache hit (Supabase) for document_id=%s", document_id)
         return JSONResponse(content=cached_result, headers={"X-Document-Id": document_id})
 
+    # If not in cache, run analysis
     result = await orchestrator.analyse(text)
-
-    document_registry[document_id] = {
-        "document_type": result.get("document_type", "Legal Document"),
-        "case_type": result.get("case_type", "civil"),
-    }
 
     response = AnalyseResponse(
         document_type=result.get("document_type", "Legal Document"),
@@ -63,7 +60,9 @@ async def analyse_document(
     )
 
     data = response.model_dump()
-    analysis_cache[document_id] = data
     
-    logger.info("[Analyse] Completed and cached for document_id=%s", document_id)
+    # Persist to Supabase
+    supabase_service.save_analysis(user_id, document_id, file.filename, data)
+    
+    logger.info("[Analyse] Completed and persisted to Supabase for doc_id=%s", document_id)
     return JSONResponse(content=data, headers={"X-Document-Id": document_id})

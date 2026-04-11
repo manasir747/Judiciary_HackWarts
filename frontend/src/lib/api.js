@@ -5,9 +5,10 @@ const api = axios.create({
   timeout: 60000,
 });
 
-export async function analyseDocument(file) {
+export async function analyseDocument(file, userId) {
   const formData = new FormData();
   formData.append("file", file);
+  formData.append("user_id", userId);
   const { data, headers } = await api.post("/analyse", formData, {
     headers: {
       "Content-Type": "multipart/form-data",

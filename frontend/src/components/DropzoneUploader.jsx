@@ -4,6 +4,7 @@ import { FileUp, Loader2, ShieldCheck, Lock } from "lucide-react";
 import { toast } from "sonner";
 
 import { analyseDocument } from "../lib/api";
+import { getCurrentUser } from "../lib/auth";
 import { useLexStore } from "../store/useLexStore";
 import { Button } from "./ui/button";
 
@@ -42,7 +43,12 @@ export function DropzoneUploader() {
 
     try {
       setLoading(true);
-      const response = await analyseDocument(file);
+      const user = await getCurrentUser();
+      if (!user) {
+        toast.error("Please sign in to analyse documents.");
+        return;
+      }
+      const response = await analyseDocument(file, user.id);
       setAnalysis(response);
     } catch (error) {
       const message =

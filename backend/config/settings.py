@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     chunk_size: int = 1200
     chunk_overlap: int = 160
     max_pdf_size_mb: int = 10
+    
+    supabase_url: str = ""
+    supabase_key: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

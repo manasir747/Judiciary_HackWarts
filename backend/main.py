@@ -11,6 +11,7 @@ from routes.chat import router as chat_router
 from services.document_service import DocumentService
 from services.orchestrator import AgentOrchestrator
 from services.vector_store import VectorStoreService
+from services.supabase_service import SupabaseService
 from utils.logger import setup_logging
 
 setup_logging()
@@ -23,12 +24,14 @@ async def lifespan(app: FastAPI):
     logger.info("Starting %s in %s mode", settings.app_name, settings.app_env)
 
     vector_store = VectorStoreService()
+    supabase_service = SupabaseService()
     document_service = DocumentService(vector_store)
     orchestrator = AgentOrchestrator(vector_store)
 
     app.state.vector_store = vector_store
     app.state.document_service = document_service
     app.state.orchestrator = orchestrator
+    app.state.supabase_service = supabase_service
 
     yield
 
