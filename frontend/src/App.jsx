@@ -24,7 +24,7 @@ export default function App() {
         </Hero>
       )}
 
-      <main className={`mx-auto w-full transition-all duration-700 ${analysis && !loading ? 'max-w-7xl opacity-100 py-24' : 'max-w-3xl'}`}>
+      <main className={`mx-auto w-full transition-all duration-700 ${analysis && !loading ? 'max-w-7xl opacity-100 py-32' : 'max-w-3xl'}`}>
         {loading ? (
           <div className="pt-40">
             <LoadingScreen />

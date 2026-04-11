@@ -13,7 +13,7 @@ export function Hero({ children }) {
       <div className="absolute inset-0 z-10 bg-gradient-to-r from-secondary via-secondary/80 to-transparent" />
       
       {/* Content */}
-      <div className="relative z-20 mx-auto grid min-h-[90vh] max-w-7xl grid-cols-1 items-center px-4 pt-20 pb-12 sm:px-6 lg:px-8 lg:grid-cols-2">
+      <div className="relative z-20 mx-auto grid min-h-[90vh] max-w-7xl grid-cols-1 items-center px-4 pt-32 pb-12 sm:px-6 lg:px-8 lg:grid-cols-2">
         <div className="animate-fadeIn">
           <div className="mb-6 flex items-center gap-2 text-primary">
             <ShieldCheck className="h-5 w-5" />
