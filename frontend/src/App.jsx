@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Toaster } from "sonner";
 
+import { AuthPage } from "./components/AuthPage";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { DropzoneUploader } from "./components/DropzoneUploader";
@@ -10,7 +12,17 @@ import { ChatPanel } from "./components/ChatPanel";
 import { useLexStore } from "./store/useLexStore";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { loading, analysis, originalLanguage, toggleOriginalLanguage } = useLexStore();
+
+  if (!isAuthenticated) {
+    return (
+      <>
+        <AuthPage onContinue={() => setIsAuthenticated(true)} />
+        <Toaster theme="dark" richColors position="top-right" />
+      </>
+    );
+  }
 
   const showHero = !analysis && !loading;
 
