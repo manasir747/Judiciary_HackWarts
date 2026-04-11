@@ -29,10 +29,9 @@ export function ChatPanel() {
     if (!message) {
       return;
     }
-    if (!documentId) {
-      toast.error("Analyse a document before chatting.");
-      return;
-    }
+    // We no longer strictly require documentId for general chatting
+    // The backend handles document_id: null for general queries
+
 
     addMessage({ role: "user", message });
     setDraft("");

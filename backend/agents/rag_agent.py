@@ -9,16 +9,19 @@ logger = logging.getLogger(__name__)
 
 class RAGAgent(BaseAgent):
     async def run(self, query: str, context_chunks: list[str]) -> str:
-        logger.info("[RAG] Retrieving context...")
-        if not context_chunks:
-            return "I could not find relevant context in this uploaded document."
-
-        context = "\n\n---\n\n".join(context_chunks)
+        logger.info("[RAG] Thinking...")
+        
+        context = "\n\n---\n\n".join(context_chunks) if context_chunks else "No document context available."
+        
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    "You are a legal Q&A assistant. Answer using ONLY the provided context. If context lacks answer, say you don't know based on document.",
+                    "You are LexAI, a highly intelligent and professional legal assistant. "
+                    "Use Markdown formatting for ALL responses to ensure they are professional and easy to read. "
+                    "Use bullet points, numbered lists, and bold text where appropriate. "
+                    "If document context is provided, prioritize it for answering questions. "
+                    "If no context is provided or the question is general, answer professionally as a legal expert."
                 ),
                 (
                     "human",

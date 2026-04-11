@@ -9,7 +9,7 @@ router = APIRouter(prefix="", tags=["chat"])
 
 
 class ChatRequest(BaseModel):
-    document_id: str
+    document_id: str | None = None
     message: str
 
 
@@ -23,9 +23,9 @@ async def chat(request: ChatRequest, app_request: Request):
     if orchestrator is None:
         raise HTTPException(status_code=500, detail="Dependencies are not configured")
 
-    if request.document_id not in document_registry:
+    if request.document_id and request.document_id not in document_registry:
         raise HTTPException(status_code=404, detail="document_id not found")
 
     reply = await orchestrator.answer_question(request.document_id, request.message)
-    logger.info("[Chat] Answered query for document_id=%s", request.document_id)
+    logger.info("[Chat] Answered query (doc_id=%s)", request.document_id)
     return ChatResponse(reply=reply)

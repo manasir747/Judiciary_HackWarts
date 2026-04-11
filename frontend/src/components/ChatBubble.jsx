@@ -9,7 +9,7 @@ export function ChatBubble({ role, message }) {
             : "bg-slate-800/80 text-slate-200 border border-white/5 rounded-tl-none"
         }`}
       >
-        {message}
+        <div className="whitespace-pre-wrap">{message}</div>
       </div>
     </div>
   );

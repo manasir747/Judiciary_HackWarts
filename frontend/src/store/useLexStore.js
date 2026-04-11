@@ -14,6 +14,7 @@ export const useLexStore = create((set) => ({
     set({
       analysis,
       documentId: analysis?.document_id || "",
+      messages: analysis ? [{ role: "ai", message: "Analysis complete. I am LexAI, your legal assistant. How can I help you understand this document?" }] : [],
     }),
   addMessage: (message) =>
     set((state) => ({ messages: [...state.messages, message] })),

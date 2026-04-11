@@ -32,7 +32,10 @@ class AgentOrchestrator:
         reviewed = await self.critic.run(draft)
         return reviewed
 
-    async def answer_question(self, document_id: str, message: str) -> str:
-        docs = self.vector_store.retrieve(document_id=document_id, query=message, k=4)
-        chunks = [doc.page_content for doc in docs]
+    async def answer_question(self, document_id: str | None, message: str) -> str:
+        chunks = []
+        if document_id:
+            docs = self.vector_store.retrieve(document_id=document_id, query=message, k=4)
+            chunks = [doc.page_content for doc in docs]
+        
         return await self.rag.run(message, chunks)
