@@ -29,7 +29,11 @@ body {
 }
 
 .font-serif {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Instrument Serif', serif;
+}
+
+.instrument {
+  font-family: 'Instrument Serif', serif;
 }
 
 .premium-glass {

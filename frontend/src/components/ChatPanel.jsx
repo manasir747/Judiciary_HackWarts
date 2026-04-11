@@ -57,7 +57,7 @@ export function ChatPanel() {
   }
 
   return (
-    <Card className="premium-glass flex flex-col h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+    <Card className="premium-glass flex flex-col h-fit p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
       <div className="mb-6 flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-primary" />
         <h2 className="font-serif text-xl font-bold text-white">Legal Assistant</h2>

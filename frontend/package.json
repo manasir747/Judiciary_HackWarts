@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@paper-design/shaders-react": "^0.0.72",
     "@radix-ui/react-slot": "^1.2.4",
     "@supabase/supabase-js": "^2.103.0",
     "axios": "^1.7.7",

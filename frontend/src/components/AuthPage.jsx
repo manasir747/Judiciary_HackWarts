@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { ButtonColorful } from "./ui/button-colorful";
 import { signIn, signUp } from "../lib/auth";
+import { ShaderBackground } from "./ui/shaders-hero-section";
 
 export function AuthPage({ onContinue }) {
   const [mode, setMode] = useState("signIn");
@@ -46,16 +47,13 @@ export function AuthPage({ onContinue }) {
     }
   }
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-secondary px-4 py-10 text-white sm:px-6 lg:px-8">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(148,163,184,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.9),transparent_36%)]" />
-      <div className="absolute left-[-10%] top-[-10%] h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-      <div className="absolute bottom-[-10%] right-[-5%] h-80 w-80 rounded-full bg-slate-800/60 blur-3xl" />
-
-      <div className="premium-glass relative z-10 w-full max-w-md rounded-[2rem] p-8 shadow-2xl shadow-black/30">
-        <div className="premium-border mb-6 inline-flex rounded-full bg-slate-950/50 p-1">
-          <button
-            type="button"
-            onClick={() => setMode("signIn")}
+    <ShaderBackground theme="bronze">
+      <div className="relative flex min-h-screen items-center justify-center px-4 py-10 text-white sm:px-6 lg:px-8">
+        <div className="premium-glass relative z-10 w-full max-w-md rounded-[2rem] p-8 shadow-2xl shadow-black/30">
+          <div className="premium-border mb-6 inline-flex rounded-full bg-slate-950/50 p-1">
+            <button
+              type="button"
+              onClick={() => setMode("signIn")}
             className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
               !isSignUp ? "bg-white text-black" : "text-slate-400 hover:text-white"
             }`}
@@ -163,6 +161,7 @@ export function AuthPage({ onContinue }) {
           </ButtonColorful>
         </form>
       </div>
-    </section>
+      </div>
+    </ShaderBackground>
   );
 }
