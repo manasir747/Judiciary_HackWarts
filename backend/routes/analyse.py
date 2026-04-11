@@ -3,6 +3,7 @@ from fastapi import APIRouter, File, UploadFile, HTTPException, Request, Form
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
+from utils.email_automation import trigger_email_automation
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="", tags=["analysis"])
 
@@ -88,5 +89,6 @@ async def analyse_document(
     # Persist to Supabase
     supabase_service.save_analysis(user_id, document_id, file.filename, data)
     
+    trigger_email_automation(user_id, data.get("summary", ""))
     logger.info("[Analyse] Completed and persisted to Supabase for doc_id=%s", document_id)
     return JSONResponse(content=data, headers={"X-Document-Id": document_id})
