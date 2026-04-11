@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ArrowRight, LockKeyhole, Mail, ShieldCheck, UserRound } from "lucide-react";
-
 import { Button } from "./ui/button";
 
 export function AuthPage({ onContinue }) {
@@ -10,14 +9,11 @@ export function AuthPage({ onContinue }) {
     email: "",
     password: "",
   });
-
   const isSignUp = mode === "signUp";
-
   function handleChange(event) {
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
   }
-
   function handleSubmit(event) {
     event.preventDefault();
     if (!form.email || !form.password || (isSignUp && !form.name)) {
@@ -26,7 +22,6 @@ export function AuthPage({ onContinue }) {
 
     onContinue();
   }
-
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-secondary px-4 py-10 text-white sm:px-6 lg:px-8">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(148,163,184,0.16),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(15,23,42,0.9),transparent_36%)]" />
