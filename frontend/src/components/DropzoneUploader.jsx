@@ -53,7 +53,9 @@ export function DropzoneUploader() {
     } catch (error) {
       const message =
         error?.response?.data?.detail ||
-        (error?.code === "ERR_NETWORK" ? "Cannot reach backend API on port 8000." : "Unable to analyse document.");
+        (error?.code === "ECONNABORTED" ? "Analysis timed out. The agents are working hard — please try again." :
+        error?.code === "ERR_NETWORK" ? "Cannot reach backend API on port 8000. Is the server running?" : 
+        "Unable to analyse document.");
       toast.error(message);
     } finally {
       setLoading(false);

@@ -63,10 +63,22 @@ async def analyse_document(
     
     # Check Supabase Cache first
     cached_result = supabase_service.get_analysis(document_id)
-    # Only use cache if it was generated with the new agents (must have risks, strategy, and simulations)
-    if cached_result and all(k in cached_result for k in ["risks", "strategy", "simulations"]):
+    # Only use cache if ALL agent outputs are non-empty lists (not stale/empty results)
+    def _is_valid_cache(data: dict) -> bool:
+        if not data:
+            return False
+        required = ["risks", "strategy", "simulations"]
+        for key in required:
+            val = data.get(key)
+            if not isinstance(val, list) or len(val) == 0:
+                return False
+        return True
+
+    if _is_valid_cache(cached_result):
         logger.info("[Analyse] Cache hit (Supabase) for document_id=%s", document_id)
         return JSONResponse(content=cached_result, headers={"X-Document-Id": document_id})
+    else:
+        logger.info("[Analyse] Cache miss or stale — re-running full agent pipeline for document_id=%s", document_id)
 
     # If not in cache, run analysis
     result = await orchestrator.analyse(text)

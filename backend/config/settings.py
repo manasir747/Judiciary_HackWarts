@@ -10,7 +10,7 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     groq_model: str = "llama-3.1-8b-instant"
-    groq_gemma_model: str = "gemma2-9b-it"
+    groq_gemma_model: str = "llama-3.3-70b-versatile"
     sendgrid_api_key: str = ""
 
     chroma_persist_directory: str = "./chroma_db"
