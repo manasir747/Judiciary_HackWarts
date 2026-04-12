@@ -37,6 +37,7 @@ async def chat(request: ChatRequest, app_request: Request):
         document_text = document_service.get_document_text(resolved_document_id)
 
     reply = await orchestrator.answer_question(document_text, request.message)
-    trigger_email_automation(None, reply, resolved_document_id)
+    # Email automation disabled by design.
+    # trigger_email_automation(None, reply, resolved_document_id)
     logger.info("[Chat] Answered query (doc_id=%s)", resolved_document_id)
     return ChatResponse(reply=reply)

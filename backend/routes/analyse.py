@@ -101,7 +101,8 @@ async def analyse_document(
     
     # Persist to Supabase
     supabase_service.save_analysis(user_id, document_id, file.filename, data)
-    
-    trigger_email_automation(user_id, data.get("summary", ""))
+
+    # Email automation disabled by design.
+    # trigger_email_automation(user_id, data.get("summary", ""))
     logger.info("[Analyse] Completed and persisted to Supabase for doc_id=%s", document_id)
     return JSONResponse(content=data, headers={"X-Document-Id": document_id})
