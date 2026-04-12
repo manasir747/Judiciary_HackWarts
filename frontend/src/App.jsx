@@ -31,9 +31,6 @@ import { ChatPanel } from "./components/ChatPanel";
 import { useLexStore } from "./store/useLexStore";
 import { getSession, signOut } from "./lib/auth";
 
-const isProd =
-  import.meta.env.PROD ||
-  (typeof process !== "undefined" && process?.env?.NODE_ENV === "production");
 
 const AgentLoader = ({ waitingOn, target, delay }) => (
   <div className="premium-glass h-full p-6 animate-fadeIn transition-all duration-300 flex flex-col items-center justify-center text-center font-serif text-slate-500" style={{ animationDelay: delay }}>
@@ -119,9 +116,6 @@ export default function App() {
         
         {showHero && (
           <Hero>
-            {isProd ? (
-              <p className="mb-4 text-center text-xs text-slate-400">Feature available in full version</p>
-            ) : null}
             <DropzoneUploader />
           </Hero>
         )}
