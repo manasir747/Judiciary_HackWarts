@@ -1,6 +1,11 @@
 import { Card } from "./ui/card";
 import { BadgeCheck, Info, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { apiCall } from "../utils/api";
+
+const isProd =
+  import.meta.env.PROD ||
+  (typeof process !== "undefined" && process?.env?.NODE_ENV === "production");
 
 export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
   const handleEmailReport = async () => {
@@ -8,14 +13,13 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
     if (!email) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/send-report`, {
+      await apiCall("/send-report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, analysis }),
       });
-      if (response.ok) toast.success("Report emailed successfully!");
-      else toast.error("Failed to send email.");
-    } catch (err) {
+      toast.success("Report emailed successfully!");
+    } catch {
       toast.error("Error sending report.");
     }
   };
@@ -53,6 +57,10 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
       </div>
 
       <div className="mt-8 pt-6 border-t border-white/5 flex flex-wrap gap-3">
+        {isProd ? (
+          <p className="w-full text-xs text-slate-500">Feature available in full version</p>
+        ) : null}
+
         <button
           onClick={onToggle}
           className="group flex items-center gap-2 rounded-lg border border-slate-800 bg-black/40 px-4 py-2 text-xs font-semibold text-slate-400 transition-all hover:border-primary/50 hover:text-white"

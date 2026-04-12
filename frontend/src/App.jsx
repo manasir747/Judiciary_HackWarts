@@ -15,6 +15,10 @@ import { ChatPanel } from "./components/ChatPanel";
 import { useLexStore } from "./store/useLexStore";
 import { getSession, signOut } from "./lib/auth";
 
+const isProd =
+  import.meta.env.PROD ||
+  (typeof process !== "undefined" && process?.env?.NODE_ENV === "production");
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -31,6 +35,14 @@ export default function App() {
     }
 
     bootstrapSession();
+  }, []);
+
+  useEffect(() => {
+    const route = window.location.pathname;
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (route === "/dashboard" && !isLoggedIn) {
+      window.location.href = "/";
+    }
   }, []);
 
   async function handleLogout() {
@@ -64,6 +76,9 @@ export default function App() {
         
         {showHero && (
           <Hero>
+            {isProd ? (
+              <p className="mb-4 text-center text-xs text-slate-400">Feature available in full version</p>
+            ) : null}
             <DropzoneUploader />
           </Hero>
         )}

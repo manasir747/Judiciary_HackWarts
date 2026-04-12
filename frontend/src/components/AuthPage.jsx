@@ -30,14 +30,20 @@ export function AuthPage({ onContinue }) {
       if (isSignUp) {
         const data = await signUp(form.email, form.password);
         if (data.session) {
+          localStorage.setItem("isLoggedIn", "true");
+          localStorage.setItem("user", form.email);
           toast.success("Account created successfully.");
+          window.location.href = "/dashboard";
           onContinue();
         } else {
           toast.success("Account created. Please check your email to verify your account.");
         }
       } else {
         await signIn(form.email, form.password);
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("user", form.email);
         toast.success("Signed in successfully.");
+        window.location.href = "/dashboard";
         onContinue();
       }
     } catch (error) {
