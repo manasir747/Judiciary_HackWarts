@@ -1,16 +1,28 @@
 from agents.input_processor_agent import InputProcessorAgent
 from agents.critic_agent import CriticAgent
-from agents.rag_agent import RAGAgent
 from agents.risk_agent import RiskAgent
 from agents.simulator_agent import SimulatorAgent
 from agents.strategy_agent import StrategyAgent
 from agents.simplifier_agent import SimplifierAgent
 from agents.summarizer_agent import SummarizerAgent
 from agents.timeline_agent import TimelineAgent
-from services.vector_store import VectorStoreService
+
+
+def generate_response_from_text(document_text: str):
+    from groq import Groq
+
+    client = Groq()
+    response = client.chat.completions.create(
+        model="mixtral-8x7b-32768",
+        messages=[
+            {"role": "system", "content": "You are a legal AI assistant. Provide clear summaries and insights."},
+            {"role": "user", "content": document_text},
+        ],
+    )
+    return response.choices[0].message.content
 
 class AgentOrchestrator:
-    def __init__(self, vector_store: VectorStoreService) -> None:
+    def __init__(self) -> None:
         self.input_processor = InputProcessorAgent()
         self.summarizer = SummarizerAgent()
         self.simplifier = SimplifierAgent()
@@ -18,9 +30,7 @@ class AgentOrchestrator:
         self.risk_agent = RiskAgent()
         self.strategy_agent = StrategyAgent()
         self.simulator_agent = SimulatorAgent()
-        self.rag = RAGAgent()
         self.critic = CriticAgent()
-        self.vector_store = vector_store
 
     async def analyse(self, document_text: str) -> dict:
         processed_data = await self.input_processor.run(document_text)
@@ -71,14 +81,13 @@ class AgentOrchestrator:
         reviewed = await self.critic.run(draft)
         return reviewed
 
-    async def answer_question(self, document_id: str | None, message: str) -> str:
+    async def answer_question(self, document_text: str | None, message: str) -> str:
         query_text = message.strip() or message
-        
-        chunks = []
-        if document_id:
-            docs = self.vector_store.retrieve(document_id=document_id, query=query_text, k=4)
-            chunks = [doc.page_content for doc in docs]
-            import logging
-            logging.getLogger(__name__).info("[Chat] Retrieved %s chunks for doc_id %s", len(chunks), document_id)
-        
-        return await self.rag.run(query_text, chunks)
+
+        full_text = (document_text or "").strip()
+        if full_text:
+            prompt_text = f"Document Text:\n{full_text}\n\nUser Query:\n{query_text}"
+        else:
+            prompt_text = query_text
+
+        return generate_response_from_text(prompt_text)

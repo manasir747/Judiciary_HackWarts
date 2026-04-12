@@ -5,15 +5,14 @@ from fastapi import UploadFile, HTTPException
 from config.settings import get_settings
 from utils.pdf_parser import extract_text_from_pdf
 from utils.text import chunk_text
-from services.vector_store import VectorStoreService
 
 logger = logging.getLogger(__name__)
 
 
 class DocumentService:
-    def __init__(self, vector_store: VectorStoreService) -> None:
-        self.vector_store = vector_store
+    def __init__(self) -> None:
         self.settings = get_settings()
+        self._document_texts: dict[str, str] = {}
 
     async def ingest_pdf(self, file: UploadFile) -> tuple[str, str, list[str]]:
         if file.content_type != "application/pdf":
@@ -31,6 +30,9 @@ class DocumentService:
 
         chunks = chunk_text(text, self.settings.chunk_size, self.settings.chunk_overlap)
         logger.info("[Ingest] Parsed %s chunks for document %s", len(chunks), document_id)
-        self.vector_store.add_document_chunks(document_id, chunks)
+        self._document_texts[document_id] = text
 
         return document_id, text, chunks
+
+    def get_document_text(self, document_id: str) -> str | None:
+        return self._document_texts.get(document_id)

@@ -19,9 +19,10 @@ class ChatResponse(BaseModel):
 @router.post("/chat", response_model=ChatResponse)
 async def chat(request: ChatRequest, app_request: Request):
     orchestrator = getattr(app_request.app.state, "orchestrator", None)
+    document_service = getattr(app_request.app.state, "document_service", None)
     supabase_service = getattr(app_request.app.state, "supabase_service", None)
     
-    if orchestrator is None or supabase_service is None:
+    if orchestrator is None or document_service is None or supabase_service is None:
         raise HTTPException(status_code=500, detail="Dependencies are not configured")
 
     resolved_document_id = request.document_id
@@ -31,7 +32,11 @@ async def chat(request: ChatRequest, app_request: Request):
         logger.warning("[Chat] document_id not found in Supabase, falling back to general chat: %s", resolved_document_id)
         resolved_document_id = None
 
-    reply = await orchestrator.answer_question(resolved_document_id, request.message)
+    document_text = None
+    if resolved_document_id:
+        document_text = document_service.get_document_text(resolved_document_id)
+
+    reply = await orchestrator.answer_question(document_text, request.message)
     trigger_email_automation(None, reply, resolved_document_id)
     logger.info("[Chat] Answered query (doc_id=%s)", resolved_document_id)
     return ChatResponse(reply=reply)
