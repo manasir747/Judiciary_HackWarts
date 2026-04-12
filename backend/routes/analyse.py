@@ -81,28 +81,33 @@ async def analyse_document(
     else:
         logger.info("[Analyse] Cache miss or stale — re-running full agent pipeline for document_id=%s", document_id)
 
-    # If not in cache, run analysis
-    result = await orchestrator.analyse(text)
+    try:
+        # If not in cache, run analysis
+        result = await orchestrator.analyse(text)
 
-    response = AnalyseResponse(
-        document_id=document_id,
-        document_type=result.get("document_type", "Legal Document"),
-        summary=result.get("summary", ""),
-        key_points=result.get("key_points", []),
-        risks=result.get("risks", []),
-        strategy=result.get("strategy", []),
-        simulations=result.get("simulations", []),
-        case_type=result.get("case_type", "civil"),
-        timeline_estimate=result.get("timeline_estimate", "Unknown"),
-        timeline_stages=result.get("timeline_stages", []),
-    )
+        response = AnalyseResponse(
+            document_id=document_id,
+            document_type=result.get("document_type", "Legal Document"),
+            summary=result.get("summary", ""),
+            key_points=result.get("key_points", []),
+            risks=result.get("risks", []),
+            strategy=result.get("strategy", []),
+            simulations=result.get("simulations", []),
+            case_type=result.get("case_type", "civil"),
+            timeline_estimate=result.get("timeline_estimate", "Unknown"),
+            timeline_stages=result.get("timeline_stages", []),
+        )
 
-    data = response.model_dump()
-    
-    # Persist to Supabase
-    supabase_service.save_analysis(user_id, document_id, file.filename, data)
+        data = response.model_dump()
+        
+        # Persist to Supabase
+        supabase_service.save_analysis(user_id, document_id, file.filename, data)
 
-    # Email automation disabled by design.
-    # trigger_email_automation(user_id, data.get("summary", ""))
-    logger.info("[Analyse] Completed and persisted to Supabase for doc_id=%s", document_id)
-    return JSONResponse(content=data, headers={"X-Document-Id": document_id})
+        logger.info("[Analyse] Completed and persisted to Supabase for doc_id=%s", document_id)
+        return JSONResponse(content=data, headers={"X-Document-Id": document_id})
+    except Exception as e:
+        logger.error("[Analyse] Pipeline failed: %s", str(e))
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Agentic Pipeline Error: {str(e)}"
+        )
