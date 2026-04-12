@@ -25,7 +25,7 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
   };
 
   return (
-    <Card className="premium-glass h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+    <Card className="premium-glass h-full p-6  transition-all duration-300 hover:shadow-premium">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="font-serif text-xl font-bold text-white">Legal Summary</h2>
         <span className="rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
@@ -78,7 +78,7 @@ export function SummaryPanel({ analysis, originalLanguage, onToggle }) {
         </button>
 
         {originalLanguage ? (
-          <div className="w-full mt-4 rounded-lg bg-slate-900/50 p-4 border border-slate-800 animate-fadeIn">
+          <div className="w-full mt-4 rounded-lg bg-slate-900/50 p-4 border border-slate-800 ">
             <p className="text-[11px] leading-relaxed text-slate-500">
               Agentic Reasoner Note: This summary was generated using multi-agent verification. 
               The original legal phrasing has been cross-referenced with judicial precedents 

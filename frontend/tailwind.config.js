@@ -29,7 +29,7 @@ export default {
         },
       },
       animation: {
-        fadeIn: "fadeIn 500ms ease-out forwards",
+        fadeIn: "fadeIn 500ms ease-out both",
       },
       boxShadow: {
         soft: "0 10px 30px rgba(0, 0, 0, 0.5)",

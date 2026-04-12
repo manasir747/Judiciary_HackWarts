@@ -32,7 +32,7 @@ export function RiskPanel({ risks }) {
   const lowCount = safeRisks.filter(r => r.severity?.toLowerCase() === "low").length;
 
   return (
-    <Card className="premium-glass h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+    <Card className="premium-glass h-full p-6  transition-all duration-300 hover:shadow-premium">
 
       {/* Header */}
       <div className="mb-5 flex items-center justify-between">

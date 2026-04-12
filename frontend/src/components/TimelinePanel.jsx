@@ -3,7 +3,7 @@ import { Gavel, Clock } from "lucide-react";
 
 export function TimelinePanel({ analysis }) {
   return (
-    <Card className="premium-glass h-full p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+    <Card className="premium-glass h-full p-6  transition-all duration-300 hover:shadow-premium">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="font-serif text-xl font-bold text-white flex items-center gap-2">
           <Gavel className="h-5 w-5 text-primary" />

@@ -10,7 +10,7 @@ import { Card } from "./ui/card";
 
 function TypingIndicator() {
   return (
-    <div className="mb-3 flex justify-start animate-fadeIn">
+    <div className="mb-3 flex justify-start ">
       <div className="rounded-2xl bg-slate-800 px-3 py-2 border border-white/5">
         <span className="typing-dot inline-block h-1.5 w-1.5 rounded-full bg-slate-500" />
         <span className="typing-dot ml-1.5 inline-block h-1.5 w-1.5 rounded-full bg-slate-500" />
@@ -57,7 +57,7 @@ export function ChatPanel() {
   }
 
   return (
-    <Card className="premium-glass flex flex-col h-fit p-6 animate-fadeIn transition-all duration-300 hover:shadow-premium">
+    <Card className="premium-glass flex flex-col h-fit p-6  transition-all duration-300 hover:shadow-premium">
       <div className="mb-6 flex items-center gap-2">
         <MessageSquare className="h-5 w-5 text-primary" />
         <h2 className="font-serif text-xl font-bold text-white">Legal Assistant</h2>

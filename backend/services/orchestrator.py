@@ -8,18 +8,27 @@ from agents.summarizer_agent import SummarizerAgent
 from agents.timeline_agent import TimelineAgent
 
 
-def generate_response_from_text(document_text: str):
-    from groq import Groq
-
-    client = Groq()
-    response = client.chat.completions.create(
-        model="mixtral-8x7b-32768",
-        messages=[
-            {"role": "system", "content": "You are a legal AI assistant. Provide clear summaries and insights."},
-            {"role": "user", "content": document_text},
-        ],
+async def generate_response_from_text(document_text: str):
+    from langchain_groq import ChatGroq
+    from config.settings import get_settings
+    from langchain_core.prompts import ChatPromptTemplate
+    
+    settings = get_settings()
+    llm = ChatGroq(
+        groq_api_key=settings.groq_api_key,
+        model=settings.groq_model,
+        temperature=0,
     )
-    return response.choices[0].message.content
+    
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", "You are a legal AI assistant. Provide clear summaries and insights based on the document if provided. Be concise and accurate."),
+        ("user", "{text}")
+    ])
+    chain = prompt | llm
+    
+    # Strictly limit the text slice to prevent context window overflow bounds checking
+    response = await chain.ainvoke({"text": document_text[:60000]})
+    return response.content
 
 class AgentOrchestrator:
     def __init__(self) -> None:
@@ -90,4 +99,4 @@ class AgentOrchestrator:
         else:
             prompt_text = query_text
 
-        return generate_response_from_text(prompt_text)
+        return await generate_response_from_text(prompt_text)
