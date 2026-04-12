@@ -13,10 +13,8 @@ langchain-community==0.3.1
 
 chromadb==0.5.11
 
-# 🔥 FIX (lighter + no GPU)
 sentence-transformers==2.7.0
-torch==2.2.2+cpu
---extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.2
 
 groq==0.11.0
 
