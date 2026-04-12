@@ -51,11 +51,8 @@ export function DropzoneUploader() {
       const response = await analyseDocument(file, user.id);
       setAnalysis(response);
     } catch (error) {
-      const message =
-        error?.response?.data?.detail ||
-        (error?.code === "ECONNABORTED" ? "Analysis timed out. The agents are working hard — please try again." :
-        error?.code === "ERR_NETWORK" ? "Cannot reach backend API on port 8000. Is the server running?" : 
-        "Unable to analyse document.");
+      console.error("[Analysis Pipeline Error]", error);
+      const message = error?.message || "Unable to analyse document. Check your internet connection.";
       toast.error(message);
     } finally {
       setLoading(false);
