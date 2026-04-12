@@ -140,7 +140,168 @@ export default function App() {
                   <h2 className="font-serif text-5xl font-bold text-white mb-4 drop-shadow-xl">Analysis Results</h2>
                   <p className="text-white/60 text-lg">Live agentic execution pipeline. Agents are routing logic payload.</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex items-center gap-4">
+                  {agentStep >= 4 && (
+                    <button
+                      onClick={() => {
+                        const btn = document.getElementById("pdf-btn");
+                        if(btn) btn.innerText = "Compiling PDF...";
+                        const script = document.createElement("script");
+                        script.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+                        script.onload = () => {
+                          const { jsPDF } = window.jspdf;
+                          const doc = new jsPDF();
+                          
+                          doc.setFont("times", "bold");
+                          doc.setFontSize(22);
+                          doc.text("LexAI Agentic Analysis Report", 20, 20);
+                          
+                          doc.setFontSize(12);
+                          doc.setFont("times", "italic");
+                          doc.text(`Document Type: ${analysis.document_type || 'General Legal Document'}`, 20, 30);
+                          doc.text(`Case Type Classification: ${analysis.case_type?.toUpperCase()}`, 20, 37);
+
+                          // 1. EXECUTIVE SUMMARY & KEY POINTS
+                          doc.setFontSize(16);
+                          doc.setFont("times", "bold");
+                          doc.text("1. Executive Summary", 20, 50);
+                          doc.setFontSize(11);
+                          doc.setFont("times", "normal");
+                          const splitSummary = doc.splitTextToSize(analysis.summary || 'No summary generated.', 170);
+                          doc.text(splitSummary, 20, 60);
+
+                          let nextY = 60 + (splitSummary.length * 5) + 5;
+                          
+                          if (analysis.key_points && analysis.key_points.length > 0) {
+                            doc.setFont("times", "italic");
+                            doc.text("Key Findings:", 20, nextY);
+                            nextY += 7;
+                            doc.setFont("times", "normal");
+                            analysis.key_points.forEach(point => {
+                              const splitPoint = doc.splitTextToSize(`• ${point}`, 165);
+                              doc.text(splitPoint, 25, nextY);
+                              nextY += (splitPoint.length * 5) + 2;
+                              if (nextY > 270) { doc.addPage(); nextY = 20; }
+                            });
+                          }
+                          nextY += 5;
+
+                          // 2. JUDICIAL TIMELINE
+                          if (nextY > 250) { doc.addPage(); nextY = 20; }
+                          doc.setFontSize(16);
+                          doc.setFont("times", "bold");
+                          doc.text("2. Judicial Timeline Projection", 20, nextY);
+                          doc.setFontSize(11);
+                          nextY += 8;
+                          doc.setFont("times", "italic");
+                          doc.text(`Estimated Duration: ${analysis.timeline_estimate || "Unknown"}`, 20, nextY);
+                          nextY += 8;
+                          
+                          if (analysis.timeline_stages && analysis.timeline_stages.length > 0) {
+                            doc.setFont("times", "normal");
+                            analysis.timeline_stages.forEach((stage, idx) => {
+                              doc.setFont("times", "bold");
+                              doc.text(`Stage ${idx + 1}: ${stage.stage}`, 25, nextY);
+                              nextY += 5;
+                              doc.setFont("times", "normal");
+                              const splitDesc = doc.splitTextToSize(stage.description, 160);
+                              doc.text(splitDesc, 30, nextY);
+                              nextY += (splitDesc.length * 5) + 4;
+                              if (nextY > 270) { doc.addPage(); nextY = 20; }
+                            });
+                          } else {
+                            doc.text("No clear timeline parameters identified.", 20, nextY);
+                            nextY += 10;
+                          }
+                          nextY += 5;
+
+                          // 3. CRITICAL RISKS
+                          if (nextY > 250) { doc.addPage(); nextY = 20; }
+                          doc.setFontSize(16);
+                          doc.setFont("times", "bold");
+                          doc.text("3. Critical Risks Identified", 20, nextY);
+                          doc.setFontSize(11);
+                          doc.setFont("times", "normal");
+                          nextY += 10;
+                          
+                          if (analysis.risks && analysis.risks.length > 0) {
+                            analysis.risks.forEach((r, idx) => {
+                              doc.setFont("times", "bold");
+                              doc.text(`${idx + 1}. [${(r.severity || 'UNKNOWN').toUpperCase()}] ${r.risk}`, 20, nextY);
+                              nextY += 5;
+                              doc.setFont("times", "italic");
+                              const splitMitigation = doc.splitTextToSize(`Mitigation Strategy: ${r.mitigation}`, 160);
+                              doc.text(splitMitigation, 25, nextY);
+                              nextY += (splitMitigation.length * 5) + 5;
+                              
+                              if (nextY > 270) { doc.addPage(); nextY = 20; }
+                            });
+                          } else {
+                            doc.text("No critical procedural risks identified.", 20, nextY);
+                            nextY += 10;
+                          }
+                          nextY += 5;
+
+                          // 4. STRATEGIC ROADMAP
+                          if (nextY > 250) { doc.addPage(); nextY = 20; }
+                          doc.setFontSize(16);
+                          doc.setFont("times", "bold");
+                          doc.text("4. Actionable Strategic Roadmap", 20, nextY);
+                          doc.setFontSize(11);
+                          doc.setFont("times", "normal");
+                          nextY += 10;
+
+                          if (analysis.strategy && analysis.strategy.length > 0) {
+                            analysis.strategy.forEach((s, idx) => {
+                              doc.setFont("times", "bold");
+                              doc.text(`Phase ${idx + 1}: ${s.step}`, 20, nextY);
+                              nextY += 5;
+                              doc.setFont("times", "normal");
+                              const splitStrategy = doc.splitTextToSize(s.description, 160);
+                              doc.text(splitStrategy, 25, nextY);
+                              nextY += (splitStrategy.length * 5) + 5;
+
+                              if (nextY > 270) { doc.addPage(); nextY = 20; }
+                            });
+                          }
+                          nextY += 5;
+
+                          // 5. LEGAL OUTCOMES / SIMULATIONS
+                          if (nextY > 250) { doc.addPage(); nextY = 20; }
+                          doc.setFontSize(16);
+                          doc.setFont("times", "bold");
+                          doc.text("5. Simulated Outcomes", 20, nextY);
+                          doc.setFontSize(11);
+                          doc.setFont("times", "normal");
+                          nextY += 10;
+
+                          if (analysis.simulations && analysis.simulations.length > 0) {
+                            analysis.simulations.forEach((sim, idx) => {
+                              doc.setFont("times", "bold");
+                              doc.text(`Scenario ${idx + 1}: ${sim.scenario} [Probability: ${(sim.probability || 'N/A').toUpperCase()}]`, 20, nextY);
+                              nextY += 5;
+                              doc.setFont("times", "normal");
+                              const splitLogic = doc.splitTextToSize(`Core Logic: ${sim.reasoning}`, 160);
+                              doc.text(splitLogic, 25, nextY);
+                              nextY += (splitLogic.length * 5) + 5;
+
+                              if (nextY > 270) { doc.addPage(); nextY = 20; }
+                            });
+                          } else {
+                            doc.text("No predictive outcomes generated.", 20, nextY);
+                          }
+
+                          doc.save("LexAI-Analysis-Report.pdf");
+                          if(btn) btn.innerText = "Download Print";
+                        };
+                        document.body.appendChild(script);
+                      }}
+                      id="pdf-btn"
+                      className="rounded-lg bg-primary px-4 py-2 text-xs font-bold text-black transition-all hover:bg-slate-200 shadow-[0_0_15px_rgba(148,163,184,0.3)] animate-fadeIn"
+                    >
+                      Download Print
+                    </button>
+                  )}
                   <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                     <span className="relative flex h-2 w-2">
                       <span className={agentStep < 4 ? "animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" : "hidden"}></span>
