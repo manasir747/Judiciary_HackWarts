@@ -1,15 +1,39 @@
 from typing import List
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_core.embeddings import Embeddings
 
 from config.settings import get_settings
+
+
+model = None
+
+
+def get_model():
+    global model
+    if model is None:
+        from sentence_transformers import SentenceTransformer
+
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
+
+class LazySentenceTransformerEmbeddings(Embeddings):
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        model_instance = get_model()
+        vectors = model_instance.encode(texts, show_progress_bar=False)
+        return vectors.tolist()
+
+    def embed_query(self, text: str) -> list[float]:
+        model_instance = get_model()
+        vector = model_instance.encode(text, show_progress_bar=False)
+        return vector.tolist()
 
 
 class VectorStoreService:
     def __init__(self) -> None:
         settings = get_settings()
-        self.embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        self.embeddings = LazySentenceTransformerEmbeddings()
         self.store = Chroma(
             collection_name="lexai_docs",
             embedding_function=self.embeddings,
