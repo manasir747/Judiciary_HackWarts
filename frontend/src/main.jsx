@@ -1,3 +1,4 @@
+// LexAI Production Deployment v1.0.1
 import React from "react";
 import ReactDOM from "react-dom/client";
 
