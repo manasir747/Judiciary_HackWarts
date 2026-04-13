@@ -10,7 +10,10 @@ class Settings(BaseSettings):
 
     groq_api_key: str = ""
     groq_model: str = "llama-3.1-8b-instant"
-    groq_gemma_model: str = "llama-3.3-70b-versatile"
+    
+    gemma_api_key: str = ""
+    gemma_model: str = "google/gemma-4-26b-a4b-it:free"
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
 
     chroma_persist_directory: str = "./chroma_db"
     chunk_size: int = 1200

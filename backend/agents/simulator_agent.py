@@ -19,9 +19,8 @@ SYSTEM_PROMPT = (
 
 
 class SimulatorAgent(BaseAgent):
-    def __init__(self) -> None:
-        settings = get_settings()
-        super().__init__(model_name=settings.groq_gemma_model)
+    def __init__(self, provider: str = "groq") -> None:
+        super().__init__(provider=provider)
 
     async def run(self, summary: str, strategy: List[Dict]) -> Dict:
         logger.info("[SimulatorAgent] Running legal simulations using Gemma 2...")

@@ -20,9 +20,8 @@ SYSTEM_PROMPT = (
 
 
 class RiskAgent(BaseAgent):
-    def __init__(self) -> None:
-        settings = get_settings()
-        super().__init__(model_name=settings.groq_gemma_model)
+    def __init__(self, provider: str = "groq") -> None:
+        super().__init__(provider=provider)
 
     async def run(self, text: str, summary: str = "") -> Dict:
         logger.info("[RiskAgent] Analyzing legal risks with Gemma 2...")
