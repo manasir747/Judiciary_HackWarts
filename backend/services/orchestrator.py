@@ -47,25 +47,27 @@ class AgentOrchestrator:
         
         import asyncio
         # 1. Start with Analyst (Summary) and Timeline in parallel
-        summary_task = self.summarizer.run(clean_text)
-        timeline_task = self.timeline.run(clean_text)
-        summary_data, timeline_data = await asyncio.gather(summary_task, timeline_task)
+        # These are the foundations
+        summary_data, timeline_data = await asyncio.gather(
+            self.summarizer.run(clean_text),
+            self.timeline.run(clean_text)
+        )
         summary_txt = summary_data.get("summary", "")
 
-        # 2. Risk Agent depends on Analyst Summary
-        risk_data = await self.risk_agent.run(clean_text, summary_txt)
-        risks_list = risk_data.get("risks", [])
+        # 2. Parallelize everything else that depends on the summary
+        # Risk, Strategy, Simulation, and Simplification can all run at once
+        results = await asyncio.gather(
+            self.risk_agent.run(clean_text, summary_txt),
+            self.strategy_agent.run(summary_txt, []), # Strategy can run independently in parallel now
+            self.simulator_agent.run(summary_txt, []), # Simulator can run independently in parallel now
+            self.simplifier.run(summary_txt)
+        )
         
-        # 3. Strategy depends on Summary AND Risks
-        strategy_data = await self.strategy_agent.run(summary_txt, risks_list)
+        risk_data, strategy_data, simulation_data, simplified_summary = results
+        
+        risks_list = risk_data.get("risks", [])
         next_steps = strategy_data.get("next_steps", [])
-
-        # 4. Simulation depends on Summary AND Strategy
-        simulation_data = await self.simulator_agent.run(summary_txt, next_steps)
         scenarios = simulation_data.get("scenarios", [])
-
-        # 5. Simplifier (Final Polish for UI)
-        simplified_summary = await self.simplifier.run(summary_txt)
 
 
         draft = {
